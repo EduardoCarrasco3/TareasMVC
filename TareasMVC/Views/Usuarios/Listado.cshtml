@@ -1,0 +1,55 @@
+﻿@using TareasMVC.Servicios
+@model UsuariosListadoViewModel
+
+@{
+    ViewData["Title"] = "Listado de Usuarios";
+    Layout = "../Shared/_Layout";
+}
+
+<h1>Listado de Usuarios</h1>
+
+@if (Model.Mensaje is not null)
+{
+    <div class="alert alert-info">
+        @Model.Mensaje
+    </div>
+}
+
+@if (Model.Usuarios is not null)
+{
+    <form method="post">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td>Acción</td>
+                    <td>Email</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var usuario in Model.Usuarios)
+                {
+                    <tr>
+                        <td>
+                            <button class="btn btn-primary me-2" 
+                            asp-action="HacerAdmin" 
+                            asp-route-email="@usuario.Email">
+                                Hacer Administrador
+                            </button>
+                            @if(User.HasClaim(Constantes.ClaimEliminarAdmin, "true"))
+                            {
+                                <button class="btn btn-danger me-2"
+                                    asp-action="EliminarAdmin"
+                                    asp-route-email="@usuario.Email">
+                                Eliminar Administrador
+                            </button>
+                            }
+                        </td>
+                        <td>
+                            @usuario.Email
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+}

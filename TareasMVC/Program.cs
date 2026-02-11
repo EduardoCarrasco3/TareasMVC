@@ -1,12 +1,28 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using TareasMVC;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var politicaUsuariosAutenticados = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(opciones =>
+{
+    opciones.Filters.Add(new AuthorizeFilter(politicaUsuariosAutenticados));
+});
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AgregarAdmin", policy =>
+        policy.RequireClaim("AgregarAdmin", "true"))
+    .AddPolicy("EliminarAdmin", policy =>
+        policy.RequireClaim("EliminarAdmin", "true"));
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(opciones 
     => opciones.UseSqlServer("name=DefaultConnection"));
