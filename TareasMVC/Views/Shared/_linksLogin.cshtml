@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
+@using TareasMVC.Entidades
+@inject SignInManager<User> SignInManager
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))

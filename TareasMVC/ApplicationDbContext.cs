@@ -4,7 +4,7 @@ using TareasMVC.Entidades;
 
 namespace TareasMVC
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -22,5 +22,6 @@ namespace TareasMVC
         public DbSet<Tarea> Tareas { get; set; }
         public DbSet<Paso> Pasos { get; set; }
         public DbSet<ArchivoAdjunto> ArchivoAdjuntos { get; set; }
+        public DbSet<User> Usuarios { get; set; }
     }
 }

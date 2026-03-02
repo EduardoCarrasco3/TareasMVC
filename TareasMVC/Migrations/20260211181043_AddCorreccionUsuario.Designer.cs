@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TareasMVC;
 
@@ -11,9 +12,11 @@ using TareasMVC;
 namespace TareasMVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260211181043_AddCorreccionUsuario")]
+    partial class AddCorreccionUsuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,11 +214,11 @@ namespace TareasMVC.Migrations
 
             modelBuilder.Entity("TareasMVC.Entidades.Tarea", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
@@ -231,12 +234,7 @@ namespace TareasMVC.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("UsuarioCreacionId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioCreacionId");
+                    b.HasKey("id");
 
                     b.ToTable("Tareas");
                 });
@@ -387,15 +385,6 @@ namespace TareasMVC.Migrations
                         .IsRequired();
 
                     b.Navigation("Tarea");
-                });
-
-            modelBuilder.Entity("TareasMVC.Entidades.Tarea", b =>
-                {
-                    b.HasOne("TareasMVC.Entidades.User", "UsuarioCreacion")
-                        .WithMany()
-                        .HasForeignKey("UsuarioCreacionId");
-
-                    b.Navigation("UsuarioCreacion");
                 });
 
             modelBuilder.Entity("TareasMVC.Entidades.Tarea", b =>

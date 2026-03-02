@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using TareasMVC;
+using TareasMVC.Entidades;
+using TareasMVC.Servicios;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +30,7 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddDbContext<ApplicationDbContext>(opciones 
     => opciones.UseSqlServer("name=DefaultConnection"));
 builder.Services.AddAuthentication();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(opciones => 
+builder.Services.AddIdentity<User, IdentityRole>(opciones => 
 {
     opciones.SignIn.RequireConfirmedAccount = false;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
@@ -38,6 +41,10 @@ builder.Services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.Ap
     
     opciones.AccessDeniedPath = "/usuarios/login";
 });
+
+builder.Services.AddTransient<IServicioUsuarios, ServicioUsuarios>();
+
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

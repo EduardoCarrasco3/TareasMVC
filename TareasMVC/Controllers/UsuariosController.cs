@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TareasMVC.Entidades;
 using TareasMVC.Models;
 using TareasMVC.Servicios;
 
@@ -11,12 +12,12 @@ namespace TareasMVC.Controllers
 {
     public class UsuariosController : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<User> userManager;
+        private readonly SignInManager<User> signInManager;
         private readonly ApplicationDbContext applicationDbContext;
 
-        public UsuariosController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+        public UsuariosController(UserManager<User> userManager,
+            SignInManager<User> signInManager,
             ApplicationDbContext applicationDbContext)
         {
             this.userManager = userManager;
@@ -38,7 +39,7 @@ namespace TareasMVC.Controllers
             {
                 return View(modelo);
             }
-            var usuario = new IdentityUser() { Email = modelo.Email, UserName = modelo.Email };
+            var usuario = new User() { Email = modelo.Email, UserName = modelo.Email };
 
             var resultado = await userManager.CreateAsync(usuario, password: modelo.Password);
 
@@ -104,64 +105,64 @@ namespace TareasMVC.Controllers
             return new ChallengeResult(proveedor, propiedades);
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> RegistrarUsuarioExterno(string urlRetorno = null,
-            string remoteError = null)
-        {
-            urlRetorno = urlRetorno ?? Url.Content("~/");
-            var mensaje = "";
-            if (remoteError is not null)
-            {
-                mensaje = "Error del proveedor";
-                return RedirectToAction("login", routeValues: new { mensaje });
-            }
+        //[AllowAnonymous]
+        //public async Task<IActionResult> RegistrarUsuarioExterno(string urlRetorno = null,
+        //    string remoteError = null)
+        //{
+        //    urlRetorno = urlRetorno ?? Url.Content("~/");
+        //    var mensaje = "";
+        //    if (remoteError is not null)
+        //    {
+        //        mensaje = "Error del proveedor";
+        //        return RedirectToAction("login", routeValues: new { mensaje });
+        //    }
 
-            var info = await signInManager.GetExternalLoginInfoAsync();
-            if (info is null)
-            {
-                mensaje = "Error al cargar la informacion";
-                return RedirectToAction("login", routeValues: new { mensaje });
-            }
-            var resultadoLoginExterno = await signInManager.ExternalLoginSignInAsync(info.LoginProvider,
-                info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
-            // ya la cuenta existe
-            if (resultadoLoginExterno.Succeeded)
-            {
-                return LocalRedirect(urlRetorno);
-            }
+        //    var info = await signInManager.GetExternalLoginInfoAsync();
+        //    if (info is null)
+        //    {
+        //        mensaje = "Error al cargar la informacion";
+        //        return RedirectToAction("login", routeValues: new { mensaje });
+        //    }
+        //    var resultadoLoginExterno = await signInManager.ExternalLoginSignInAsync(info.LoginProvider,
+        //        info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
+        //    // ya la cuenta existe
+        //    if (resultadoLoginExterno.Succeeded)
+        //    {
+        //        return LocalRedirect(urlRetorno);
+        //    }
 
-            string email = "";
+        //    string email = "";
 
-            if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
-            {
-                email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            }
-            else
-            {
-                mensaje = "Error leyendo el email del usuario del proveedor";
-                return RedirectToAction("Login", routeValues: new { mensaje });
-            }
-            var usuario = new IdentityUser { Email = email, UserName = email };
+        //    if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+        //    {
+        //        email = info.Principal.FindFirstValue(ClaimTypes.Email);
+        //    }
+        //    else
+        //    {
+        //        mensaje = "Error leyendo el email del usuario del proveedor";
+        //        return RedirectToAction("Login", routeValues: new { mensaje });
+        //    }
+        //    var usuario = new IdentityUser { Email = email, UserName = email };
 
-            var resultadoCrearUsuario = await userManager.CreateAsync(usuario);
+        //    var resultadoCrearUsuario = await userManager.CreateAsync(usuario);
 
-            if (!resultadoCrearUsuario.Succeeded)
-            {
-                mensaje = resultadoCrearUsuario.Errors.First().Description;
-                return RedirectToAction("login", routeValues: new { mensaje });
-            }
+        //    if (!resultadoCrearUsuario.Succeeded)
+        //    {
+        //        mensaje = resultadoCrearUsuario.Errors.First().Description;
+        //        return RedirectToAction("login", routeValues: new { mensaje });
+        //    }
 
-            var resultadoAgregarLogin = await userManager.AddLoginAsync(usuario, info);
+        //    var resultadoAgregarLogin = await userManager.AddLoginAsync(usuario, info);
 
-            if (resultadoAgregarLogin.Succeeded)
-            {
-                await signInManager.SignInAsync(usuario, isPersistent: true, info.LoginProvider);
-                return LocalRedirect(urlRetorno);
-            }
+        //    if (resultadoAgregarLogin.Succeeded)
+        //    {
+        //        await signInManager.SignInAsync(usuario, isPersistent: true, info.LoginProvider);
+        //        return LocalRedirect(urlRetorno);
+        //    }
 
-            mensaje = "Ha ocurrido un error agregando el login";
-            return RedirectToAction("login", routeValues: new { mensaje });
-        }
+        //    mensaje = "Ha ocurrido un error agregando el login";
+        //    return RedirectToAction("login", routeValues: new { mensaje });
+        //}
         [HttpGet]
         [Authorize(Roles = Constantes.RolAdmin)]
         public async Task<IActionResult> Listado(string mensaje = null)
@@ -184,14 +185,14 @@ namespace TareasMVC.Controllers
         {
             var usuario = await applicationDbContext.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
 
-            if (usuario is null) 
+            if (usuario is null)
             {
                 return NotFound();
             }
 
             await userManager.AddToRoleAsync(usuario, Constantes.RolAdmin);
 
-            return RedirectToAction("Listado", 
+            return RedirectToAction("Listado",
                 routeValues: new { mensaje = "Rol asignado correctamente a " + email });
         }
         [HttpPost]
@@ -209,7 +210,27 @@ namespace TareasMVC.Controllers
             await userManager.RemoveFromRoleAsync(usuario, Constantes.RolAdmin);
 
             return RedirectToAction("Listado",
-                routeValues: new { mensaje = "Rol removido correctamente a " + email});
+                routeValues: new { mensaje = "Rol removido correctamente a " + email });
+        }
+        public async Task<IActionResult> Editar(string id) 
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user is null)
+            {
+                return NotFound();
+            }
+
+            var modelo = new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Sexo = user.Sexo,
+                FechaNacimiento = user.FechaNacimineto,
+                Curp = user.Curp
+            };
+
+            return View(modelo);
         }
     }
 }
