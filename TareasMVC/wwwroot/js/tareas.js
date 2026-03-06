@@ -117,6 +117,10 @@ async function manejarTarea(tarea) {
         )
     })
 
+    tareaEditarViewModel.archivosAdjuntos([]);
+
+    prepararArchivosAdjuntos(json.archivosAdjuntos);
+
     modalEditarTareaBootstrap.show();
 }
 

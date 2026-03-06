@@ -168,9 +168,7 @@ async function actualizarOrdenPasos() {
     const arregloOrganizado = tareaEditarViewModel.pasos.sorted(function (a, b) {
         return ids.indexOf(a.id().toString()) - ids.indexOf(b.id().toString());
     })
-
-    tareaEditarViewModel.pasos(arregloOrganizado); 
-
+    tareaEditarViewModel.pasos(arregloOrganizado);
 }
 
 function obtenerIdsPasos() {
@@ -181,7 +179,7 @@ function obtenerIdsPasos() {
 }
 
 async function enviarIdsPasosAlBackEnd(ids) {
-    var data = JSOn.stringify(ids);
+    var data = JSON.stringify(ids);
     await fetch(`${urlPasos}/ordenar/${tareaEditarViewModel.id}`, {
         method: 'POST',
         body: data,
